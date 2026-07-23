@@ -1,1 +1,12 @@
-{ "global": {}, "perLevel": {} }
+{
+  "global": {
+    "restitution": 0.48,
+    "gravity": 1.25,
+    "cascadeRate": 1
+  },
+  "perLevel": {
+    "25": {
+      "gravity": 1.4
+    }
+  }
+}
