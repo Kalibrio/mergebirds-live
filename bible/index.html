@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>📖</text></svg>">
+<title>Merge Birds — Game Bible</title>
+<style>
+  :root {
+    --bg: #0B2228; --surface: #113038; --surface-2: #163A43; --ink: #EAF4F2;
+    --ink-dim: #9DB8B4; --sand: #EFD97F; --sky: #57C7F7; --rosa: #FF8FB1;
+    --go: #4ADE80; --line: #1E4650; --chip-ink: #0B2228;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #F5EFDA; --surface: #FFFDF4; --surface-2: #FAF4E0; --ink: #14343C;
+      --ink-dim: #5C7A78; --sand: #C9A227; --sky: #1E88C7; --rosa: #D4547E;
+      --go: #2F9E52; --line: #E2D8B8; --chip-ink: #FFFDF4; }
+  }
+  :root[data-theme="dark"] { --bg: #0B2228; --surface: #113038; --surface-2: #163A43; --ink: #EAF4F2;
+    --ink-dim: #9DB8B4; --sand: #EFD97F; --sky: #57C7F7; --rosa: #FF8FB1; --go: #4ADE80; --line: #1E4650; --chip-ink: #0B2228; }
+  :root[data-theme="light"] { --bg: #F5EFDA; --surface: #FFFDF4; --surface-2: #FAF4E0; --ink: #14343C;
+    --ink-dim: #5C7A78; --sand: #C9A227; --sky: #1E88C7; --rosa: #D4547E; --go: #2F9E52; --line: #E2D8B8; --chip-ink: #FFFDF4; }
+  body { background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6; padding: 48px 20px 96px; }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  .display { font-family: "Arial Rounded MT Bold", "Nunito", "Segoe UI", system-ui, sans-serif; }
+  .eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 14px; }
+  h1 { font-size: clamp(30px, 6vw, 42px); line-height: 1.12; text-wrap: balance; margin-bottom: 12px; }
+  h1 .accent { color: var(--sand); }
+  .standfirst { color: var(--ink-dim); max-width: 62ch; margin-bottom: 8px; }
+  .vstamp { font-size: 12px; color: var(--ink-dim); border: 1px solid var(--line); border-radius: 999px;
+    display: inline-block; padding: 2px 12px; margin-bottom: 30px; }
+  h2 { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim);
+    margin: 48px 0 18px; display: flex; align-items: center; gap: 14px; }
+  h2::after { content: ""; height: 1px; background: var(--line); flex: 1; }
+  h3 { font-size: 17px; margin: 22px 0 8px; }
+  p { margin-bottom: 12px; max-width: 70ch; }
+  ul { list-style: none; display: grid; gap: 7px; margin-bottom: 14px; }
+  li { padding-left: 18px; position: relative; }
+  li::before { content: "▸"; position: absolute; left: 0; color: var(--sand); }
+  b { color: var(--ink); }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; margin: 10px 0 18px; }
+  table { border-collapse: collapse; width: 100%; min-width: 540px; background: var(--surface); font-size: 14px; }
+  th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+  th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); }
+  tr:last-child td { border-bottom: none; }
+  td.num, .num { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .88em; background: var(--surface-2);
+    border: 1px solid var(--line); padding: 1px 6px; border-radius: 6px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; margin: 14px 0; }
+  .rule { border-left: 3px solid var(--sand); background: var(--surface); border-radius: 0 12px 12px 0;
+    padding: 12px 16px; margin: 14px 0; font-size: 15px; }
+  .rule b { color: var(--sand); }
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--chip-ink); background: var(--go); border-radius: 999px; padding: 1px 10px; margin-right: 6px; }
+  .pill.warn { background: var(--rosa); }
+  .footer { margin-top: 56px; color: var(--ink-dim); font-size: 13px; border-top: 1px solid var(--line); padding-top: 18px; }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Living design document · mergebirds.kalibrio.com</p>
+  <h1 class="display">Merge Birds — <span class="accent">Game Bible</span></h1>
+  <p class="standfirst">The single source of truth for how the game works, why it works, and where it can grow. If a number here disagrees with the build, the build wins — then fix this document.</p>
+  <span class="vstamp">v1.0 · July 22 2026 · matches build <span class="num">17490d5</span></span>
+
+  <h2>0 · North star</h2>
+  <p><em>We sell the feeling of digging a perfect tunnel and watching luck agree with your plan.</em></p>
+  <p>Every merge game gives the player <b>placement</b>. Merge Birds gives them <b>excavation</b>: you never touch the birds — you sculpt the terrain, and gravity plays your move. That indirection reads as a physics toy, plans like a puzzle, and resolves like a slot machine settling.</p>
+  <div class="rule"><b>Pinned rules</b> — violate these and the feature dies in review: (1) nothing may ever bypass the dig; (2) no timers, tension lives in <em>space</em> (the rising water, the pile); (3) money never buys a merged bird; (4) celebrations never block play.</div>
+
+  <h2>1 · The core loop</h2>
+  <p>A <b>round</b>: three birds (a <b>trio</b>) glide onto the fresh sand block. The player carves tunnels with a finger; birds fall; same-tier birds that touch <b>merge</b> into the next tier (attract → pop → bloom, 0.18&nbsp;s attract, upward kick). When every trio bird is <em>in play</em> — reached the pool, merged away, or sunk below the start line into contact with another bird — the sand regrows around survivors and the next trio arrives, costing <b>1 move</b>. Levels are won by their goal (§4) and lost by <b>overflow</b>: the settled pile or the rising waterline breaching the lose line for 2.5&nbsp;s.</p>
+  <ul>
+    <li><b>Digging is free</b> — moves are consumed per round, so carving is play, not spend.</li>
+    <li><b>Merges relieve pressure</b> — two birds displace more water than their merged child, so the waterline visibly drops on a merge. Tension and relief share one mechanic.</li>
+    <li><b>Undermining is a tactic</b> — unsupported sand cascades (§2), so digging <em>below</em> can deliver birds a player couldn't reach directly.</li>
+  </ul>
+
+  <h2>2 · The pit — terrain &amp; water</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Material</th><th>Behavior</th><th>Feel</th></tr></thead>
+    <tbody>
+      <tr><td>Soft sand</td><td>1 dig pass; <b>falls when unsupported</b> (3 settle passes/s, 0.1 sideways topple)</td><td>hiss + light haptic</td></tr>
+      <tr><td>Packed clay</td><td>Bottom 58% of the block; 2 passes (loosens, then clears); never falls</td><td>gritty scrape + medium haptic</td></tr>
+      <tr><td>Rock</td><td>Undiggable blobs; pure routing obstacle</td><td>dull knock + hard haptic + spark</td></tr>
+      <tr><td>TNT pocket</td><td>Explodes when dug into: carves r52, shoves bodies, chains within 80px</td><td>boom, shake 11</td></tr>
+      <tr><td>Cursed stone egg</td><td>6 brush hits to crack → hatches a surprise tier 3–5 bird</td><td>knock ×6 → sproing</td></tr>
+      <tr><td>Ice bird</td><td>Frozen bird in a cube; a merge within 95px thaws it into play</td><td>glass shatter</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Water</b>: the pool surface starts low (empty-pool y660) and rises with the submerged pile (0.045&nbsp;px per px² of bird cross-section). The lose line sits 8px below the sand top; a pulsing dashed danger line + sweating, jittering birds telegraph 130px of approach. Rendering: wavy surface, submerged tint, splash columns at the actual waterline.</p>
+
+  <h2>3 · The birds</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Tier</th><th>Name</th><th>Rarity</th><th>Radius px</th><th>Merge coins</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>Chick</td><td>Common</td><td class="num">16.5</td><td class="num">—</td></tr>
+      <tr><td class="num">1</td><td>Sunny</td><td>Common</td><td class="num">19.8</td><td class="num">4</td></tr>
+      <tr><td class="num">2</td><td>Kiwi</td><td>Common</td><td class="num">23.3</td><td class="num">8</td></tr>
+      <tr><td class="num">3</td><td>Sky</td><td>Common</td><td class="num">26.8</td><td class="num">12</td></tr>
+      <tr><td class="num">4</td><td>Rosa</td><td>Rare</td><td class="num">30.1</td><td class="num">16</td></tr>
+      <tr><td class="num">5</td><td>Rusty</td><td>Rare</td><td class="num">33.2</td><td class="num">20</td></tr>
+      <tr><td class="num">6</td><td>Pengu</td><td>Rare</td><td class="num">35.8</td><td class="num">24</td></tr>
+      <tr><td class="num">7</td><td>Violet</td><td>Epic</td><td class="num">37.9</td><td class="num">28</td></tr>
+      <tr><td class="num">8</td><td>Ruby</td><td>Epic</td><td class="num">39.2</td><td class="num">32</td></tr>
+      <tr><td class="num">9</td><td>Goldie</td><td>Legendary</td><td class="num">39.7</td><td class="num">36</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>Shiny variants</b> — 1/200 spawn odds, gold sparkle trail, shine survives merges, per-tier badge in the Album.</li>
+    <li><b>Micro-life</b> — perched birds bob, blink-dip, ruffle, and turn to watch the digging finger; fallers panic-wobble and stretch; pile birds near the lose line sweat.</li>
+    <li><b>The Goldie Arrival</b> — first tier-10 merge: 1.2&nbsp;s slow-mo, golden-hour wash, sparkle rain, confetti, and every bird on the board turns and sings its motif note in a staggered chorus. +50💎, dated statue in the Aviary. Engineered legend; keep it rare.</li>
+  </ul>
+
+  <h2>4 · Level goals (win conditions)</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Type</th><th>Goal</th><th>Levels</th><th>HUD</th></tr></thead>
+    <tbody>
+      <tr><td><code>birdTarget</code></td><td>Create N birds of given tiers</td><td>most of 1–40</td><td>bird chips + fly-to-chip collect</td></tr>
+      <tr><td><code>egg</code></td><td>Escort the golden egg to the pool floor</td><td>24, 33</td><td>🥚</td></tr>
+      <tr><td><code>cage</code></td><td>Drop caged chicks into water; they break free and join the board</td><td>27 (×2), 36 (×3)</td><td>🐣 n</td></tr>
+      <tr><td><code>relic</code></td><td>Excavate golden amphorae to the floor</td><td>29 (×3)</td><td>🏺 n</td></tr>
+      <tr><td><code>nest</code></td><td>Boss nest eats settled birds of the demanded tier, in order (demand bubble shows next)</td><td>30, 35</td><td>🪺 n</td></tr>
+      <tr><td><code>infinite</code></td><td>No goal — dig until overflow (Daily Dig)</td><td>endless</td><td>∞ moves</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Level grammar curve</b>: L1–3 teach (scripted first pair, generous moves) · L4 second target · L6 rock · L8 rock funnel · L10 tier-4 ask · TNT from 21 · ice from 23 · every 5th is a spike; 30/35 are bosses; 40 is the graduation exam (tier 8). All 40 authored; the generator only backs 41+ and safety fallbacks.</p>
+
+  <h2>5 · Power-ups &amp; fever</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Booster</th><th>Effect</th><th>Start</th><th>Price 🪙</th></tr></thead>
+    <tbody>
+      <tr><td>⬆️ Level Up</td><td>Upgrades the lowest pool bird (+light beam)</td><td class="num">3</td><td class="num">120</td></tr>
+      <tr><td>🐤 Big Up</td><td>Upgrades the highest pool bird (gold beam)</td><td class="num">1</td><td class="num">220</td></tr>
+      <tr><td>🕳️ Vacuum</td><td>Removes every lowest-tier pool bird (implosion)</td><td class="num">2</td><td class="num">150</td></tr>
+      <tr><td>💣 Bomb</td><td>Arms the finger: next dig is ×3.2 radius + blast (pulsing danger frame while armed)</td><td class="num">2</td><td class="num">180</td></tr>
+      <tr><td>🍋 Lemon</td><td>Wildcard drop — merges with anything it touches (sparkle trail)</td><td class="num">1</td><td class="num">250</td></tr>
+    </tbody>
+  </table></div>
+  <p>Boosters are bought <b>pre-level in the loadout</b> (the King ritual) with coins, or as the 🎁 bundle (+1 of everything, 25💎). <b>Fever</b>: 6 merges charge the meter; activation gives 12&nbsp;s of ×1.25 speed, ×2 coins, golden brush + frame, and the music's fever stem. <b>Combos</b>: merges within 2.2&nbsp;s chain; pitch climbs the pentatonic per combo step; combo ≥4 triggers 0.5&nbsp;s slow-mo with a zoom punch.</p>
+
+  <h2>6 · Game modes</h2>
+  <h3>Campaign</h3>
+  <p>40 authored levels on the Journey map (stars, replays, goal markers). Stars: 3★ at 100% of the level's hand-tuned score target, 2★ at 55%, 1★ at 22%.</p>
+  <h3>Daily Dig</h3>
+  <p>One date-seeded endless pit per day — same rocks, TNT, stone egg, and theme for every player. No moves, no goals; overflow ends it; score banks as coins. Per-day best is tracked and shareable. <b>Weekly modifiers</b> rotate: <code>classic</code> · <code>low-gravity</code> (0.9) · <code>all-clay</code> (clay from 12% depth) · <code>lemon-rain</code> (free lemon every 40&nbsp;s). First dig of each day pays +2💎.</p>
+  <h3>Bird Race (tournament)</h3>
+  <p>Every level is an async race: your live target-progress vs <b>ghost curves of your own past runs</b> (sampled every 5&nbsp;s, last 4 kept) plus synthetic pacers until history exists. Standings re-rank each second; placement pays 50/30/20/10/10 bonus coins. Daily window ends at local midnight. <b>Ghost share links</b> (<code>?ghost=code</code>) inject a friend's run as an opponent — viral, zero backend.</p>
+
+  <h2>7 · Meta &amp; retention</h2>
+  <ul>
+    <li><b>Daily missions</b> — 3 parallel, date-seeded from a pool of 6 (merge 20 · dig 600 · collect 6 targets · combo ×4 · win 3 · fever ×2). Auto-claimed micro-rewards via non-blocking banners. Weekly goal: win 12 → 800🪙.</li>
+    <li><b>Win streaks</b> — 2: chest +100🪙 · 3: +1💣 · 5: +300🪙 +5💎. Real fails reset; the near-win rescue does not.</li>
+    <li><b>Migration Pass</b> — free monthly track, 10 nodes at 50&nbsp;pts each. Points: win 10 + 2×stars (+5 for 1st place); Daily Dig up to 20. Final node pays 15💎.</li>
+    <li><b>Aviary (Bird Album)</b> — tap a bird, it sings its motif note; rarity borders; set-completion bonuses 100/250/500/1000🪙 (+20💎 Legendary); Goldie quest meter + dated statue; <b>nest decoration</b> unlocks at 10★/25★ totals.</li>
+    <li><b>Session pacing</b> — &gt;15 level-starts per hour earns exactly one friendly stretch nudge per hour. No hard limits, no reward nerfs.</li>
+  </ul>
+
+  <h2>8 · Economy</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Currency</th><th>Sources</th><th>Sinks</th></tr></thead>
+    <tbody>
+      <tr><td>🪙 Coins</td><td>merges (tier×4, fever ×2), race placement, missions, streaks, pass, album sets, Daily Dig banking</td><td>booster loadout (120–250)</td></tr>
+      <tr><td>💎 Gems <span class="pill">v0</span></td><td>streak ×5 (+5), Legendary set (+20), first Goldie (+50), first daily dig (+2/day), pass node 10 (15), 10 starter</td><td>🎁 loadout bundle (25)</td></tr>
+      <tr><td>★ Stars</td><td>level score vs target</td><td>nest decoration milestones; future cosmetic gates</td></tr>
+    </tbody>
+  </table></div>
+  <p><span class="pill warn">Future</span> IAP = selling gems; rewarded ads = the near-win rescue slot + double-coin cashouts. Both sit unfilled by design — the placements exist, the SDKs don't yet.</p>
+
+  <h2>9 · Difficulty science</h2>
+  <ul>
+    <li><b>Scripted first session</b> — L1's opening trio is [Chick, Chick, Sunny]: the first fall produces the first merge. Tutorial hand until first dig. Gift bomb before L3.</li>
+    <li><b>Quiet assist</b> — 2 consecutive fails on a level flattens the spawner (exponent 1.6→1.0) and allows one tier higher. Invisible; resets on a win.</li>
+    <li><b>Near-win rescue</b> — failing exactly 1 short of the goal offers +2 free moves, once per attempt.</li>
+    <li><b>Instrumentation</b> — <code>?stats=1</code>: per-level starts/wins/fails with ⚠ flags under 40% winrate, plus a 15&nbsp;s gameplay clip recorder (the ad-creative factory). Events also queryable via <code>__mbEvents()</code>.</li>
+  </ul>
+
+  <h2>10 · Feel &amp; audio identity</h2>
+  <ul>
+    <li><b>Merge choreography</b> — attract (pull + inflate + lean-in) → pop (flash, double ring, tier-colored burst, stars) → bloom (elastic overshoot). Impact squash on every hard contact; 120&nbsp;Hz fixed-substep physics.</li>
+    <li><b>The motif</b> — everything musical is major pentatonic on C5. Merge chimes climb by tier <em>and</em> combo; each bird's Aviary voice is its tier's note; the Goldie chorus is the whole scale. The motif <em>is</em> the audio logo.</li>
+    <li><b>Two-stem music</b> — calm dig loop (pad + sparse plucks) and fever layer (16th arpeggio + hats) on separate buses, crossfaded by live game intensity (fever, combos, danger). Fully synthesized; zero audio assets.</li>
+    <li><b>Premium rendering</b> — ×3 supersampled terrain, contact shadows, vignette, biome backdrops (day clouds / sunset sun / night stars + moon), golden-hour and fever full-screen states.</li>
+  </ul>
+
+  <h2>11 · Tuning &amp; tooling</h2>
+  <p><code>?tune=1</code> opens the live dashboard: 15 dials, <b>Global</b> and <b>per-level</b> scopes (level beats global; overridden dials go yellow), live-apply for physics, restart for the rest, JSON export. Designers tune on the phone, export, and the numbers get baked into defaults.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Dial</th><th>Default</th><th>Dial</th><th>Default</th></tr></thead>
+    <tbody>
+      <tr><td>Gravity</td><td class="num">1.6</td><td>Moves</td><td class="num">per level</td></tr>
+      <tr><td>Bounce</td><td class="num">0.32</td><td>3★ score</td><td class="num">per level</td></tr>
+      <tr><td>Dig radius</td><td class="num">22</td><td>Fever length</td><td class="num">12 s</td></tr>
+      <tr><td>Clay depth</td><td class="num">0.58</td><td>Merges → fever</td><td class="num">6</td></tr>
+      <tr><td>Water rise</td><td class="num">0.045</td><td>Cascade speed</td><td class="num">3 /s</td></tr>
+      <tr><td>Lose grace</td><td class="num">2.5 s</td><td>Cascade spread</td><td class="num">0.10</td></tr>
+      <tr><td>Spawn low-bias</td><td class="num">1.6</td><td>Bundle price</td><td class="num">25 💎</td></tr>
+      <tr><td>Spawn max tier</td><td class="num">per level</td><td></td><td></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>12 · Tech &amp; ops</h2>
+  <ul>
+    <li><b>Stack</b> — TypeScript + Vite + matter-js + canvas; DOM overlay UI; WebAudio synth. No other dependencies, no audio/art pipeline.</li>
+    <li><b>Ship shape</b> — one self-contained ~630&nbsp;KB <code>index.html</code> (sprites inlined) + manifest + icon. PWA: add-to-home-screen runs full-screen.</li>
+    <li><b>Deploy</b> — build → singlefile → push to <code>Kalibrio/mergebirds-live</code> → GitHub Pages serves <code>mergebirds.kalibrio.com</code> (HTTPS enforced). ~1 minute to live.</li>
+    <li><b>Saves</b> — all local: <code>merge-birds-save-v1</code> (progress, currencies, album, ghosts, streaks), <code>mb-missions-v1</code>, <code>mb-tuning-v1</code>, <code>mb-events-v1</code>. Migration = spread-over-defaults; add fields, never rename.</li>
+  </ul>
+
+  <h2>13 · Expansion map</h2>
+  <div class="card">
+    <h3>Ready lanes (client-only)</h3>
+    <ul>
+      <li><b>More grammar</b> — the material/entity system takes new pieces cheaply: geysers that launch birds, moving rock platforms, sandstorm rounds, multi-chamber pits.</li>
+      <li><b>Cosmetics depth</b> — dig-brush trails, bird skins, pit themes; sinks for stars and gems; Pass becomes cosmetic-heavy.</li>
+      <li><b>Events</b> — the Daily Dig seed + modifier system generalizes to weekend events and themed weeks without new mechanics.</li>
+      <li><b>Sprite-sheet micro-life</b> — true blinks/cheek-puffs when bird art gets a second pass.</li>
+    </ul>
+    <h3>Blocked lanes (need outside inputs)</h3>
+    <ul>
+      <li><b>Backend tier</b> (AWS creds): real leaderboard divisions, Flocks/clubs, cross-device saves, analytics collection, kill-gate measurement (D1 ≥ 40%, D7 ≥ 20%, D30 ≥ 10%).</li>
+      <li><b>Native wrapper</b> (Xcode): Taptic haptics, Game Center, push, App Store.</li>
+      <li><b>Monetization SDKs</b>: rewarded ads into the rescue slot; IAP selling gems.</li>
+    </ul>
+  </div>
+  <p>When adding anything, re-read §0. The dig is the game; everything else is an amplifier.</p>
+
+  <p class="footer">Maintained by the game-design seat. Update cadence: every merged gameplay change bumps the version stamp and touches the affected section — a bible that trails the build is worse than no bible. Companion doc: the Greenlight Review (vision conversation, kill gates, bible-vs-build ledger).</p>
+</div>
