@@ -97,17 +97,17 @@ ${JSON.stringify(Ze(),null,2)}`;navigator.share?navigator.share({text:i}).catch(
         .race-title { display:flex; justify-content:space-between; font-size:14px; padding:6px 4px 0; color:#ffe066; }
         /* Royal Kingdom HUD: two dimensional cards own the top — TARGET and
            MOVES. Everything else is a whisper (scoremini) */
-        /* INFO IS LIGHT, GAME IS DARK (the Royal Match contrast rule):
-           parchment cards with dark chunky numbers — readable at a glance */
+        /* Brawl Stars-school HUD: rich navy glass panels, ONE label token,
+           white chunky numbers with smooth dark outlines */
         .hudcard { position:absolute; top:8px; z-index:4; text-align:center; padding:7px 8px 8px;
           width:calc(50% - 15px); height:86px; box-sizing:border-box; overflow:visible;
           display:flex; flex-direction:column; align-items:center;
-          background:linear-gradient(#fffdf4, #f7ecd2 55%, #edd9b2); border:3px solid #453e63; border-radius:18px;
-          box-shadow:0 5px 0 rgba(30,24,55,.55), 0 9px 16px rgba(10,5,30,.35), inset 0 2px 0 #ffffff; }
+          background:linear-gradient(#41537f, #2c3a61 55%, #253251); border:3px solid #17203a; border-radius:18px;
+          box-shadow:0 5px 0 #10182c, 0 9px 16px rgba(5,8,20,.45), inset 0 2px 0 rgba(255,255,255,.28); }
         .targetcard { left:10px; }
         .hudcard.movesb { right:10px; }
-        .hudcard .lbl { font-size:12px; color:#a8701c; letter-spacing:1.5px; text-shadow:0 1px 0 rgba(255,255,255,.6);
-          height:15px; line-height:15px; }
+        .hudcard .lbl { font-size:13px; color:#ffd21c; letter-spacing:1.5px; height:16px; line-height:16px;
+          text-shadow:0 2px 0 rgba(10,14,30,.7); }
         /* Royal minimalism: TARGET and MOVES are the whole play HUD.
            Stars/score and level/coins stay tracked but undisplayed (the win
            screen and journey carry them) — flip these back on if ever missed */
@@ -126,10 +126,8 @@ ${JSON.stringify(Ze(),null,2)}`;navigator.share?navigator.share({text:i}).catch(
         .coinbar .fill { position:absolute; inset:0 auto 0 0; width:0%; transition:width .25s;
           background:linear-gradient(#fff3a0, #ffd21c 55%, #f0a500); box-shadow:0 0 8px rgba(255,220,70,.6); }
         .coinbar .val { position:absolute; inset:0; text-align:center; font-size:11px; line-height:16px; color:#123; }
-        .movesb { text-align:center; }
-        .movesb .lbl { font-size:15px; } .movesb .num { font-size:26px; line-height:1; }
-        .targets { text-align:center; min-width:96px; }
-        .targets .lbl { font-size:15px; }
+        .movesb { text-align:center; } /* legacy label/number sizes removed —
+          they silently overrode the shared .hudcard tokens on MOVES only */
         /* DESIGN SYSTEM RULE — a value is a NUMBER RIGHT OF ITS ICON, 19px,
            white with the standard dark outline. Both hudcards share label
            style and a 48px value row; MOVES' single number is the same
@@ -137,17 +135,21 @@ ${JSON.stringify(Ze(),null,2)}`;navigator.share?navigator.share({text:i}).catch(
         /* GOAL value row: bird then its dark count right beside — no outlines
            needed on parchment, the contrast does the work */
         .tchips { flex:1; display:flex; gap:12px; justify-content:center; align-items:center; }
-        .tchip { position:relative; display:flex; align-items:center; gap:4px; }
-        .tchip img { width:42px; height:42px; filter:drop-shadow(0 2px 2px rgba(60,40,10,.25)); }
-        .tchip .cnt { font-size:26px; line-height:1; color:#333a63; text-shadow:0 1px 0 rgba(255,255,255,.5); }
+        .tchip { position:relative; display:flex; align-items:center; gap:5px; }
+        .tchip img { width:42px; height:42px; filter:drop-shadow(0 3px 3px rgba(5,8,20,.4)); }
+        /* the number voice: white, smooth 8-way dark outline, soft ledge */
+        .tchip .cnt { font-size:27px; line-height:1; color:#fff;
+          text-shadow:-2px 0 0 #17203a, 2px 0 0 #17203a, 0 -2px 0 #17203a, 0 2px 0 #17203a,
+            -1.4px -1.4px 0 #17203a, 1.4px -1.4px 0 #17203a, -1.4px 1.4px 0 #17203a, 1.4px 1.4px 0 #17203a,
+            0 4px 0 #10182c, 0 6px 8px rgba(0,0,0,.35); }
         /* three-target levels compact automatically */
         .tchips:has(.tchip:nth-child(3)) { gap:6px; }
-        .tchips:has(.tchip:nth-child(3)) .tchip { gap:2px; }
+        .tchips:has(.tchip:nth-child(3)) .tchip { gap:3px; }
         .tchips:has(.tchip:nth-child(3)) .tchip img { width:32px; height:32px; }
-        .tchips:has(.tchip:nth-child(3)) .tchip .cnt { font-size:19px; }
+        .tchips:has(.tchip:nth-child(3)) .tchip .cnt { font-size:20px; }
         .tchip.done .cnt { display:none; }
-        .tchip.done::after { content:'✓'; color:#2fa14c; font-size:28px; line-height:1;
-          text-shadow:0 1px 0 rgba(255,255,255,.6); }
+        .tchip.done::after { content:'✓'; color:#4ade80; font-size:30px; line-height:1;
+          text-shadow:-2px 0 0 #17203a, 2px 0 0 #17203a, 0 -2px 0 #17203a, 0 2px 0 #17203a, 0 4px 0 #10182c; }
         /* action bar: DECK SLOTS (Clash Royale school) — each action is a
            card-box in the same panel token as the hudcards */
         /* full-width deck: same 10px side margins as the top cards, slots flex to fill */
@@ -155,8 +157,8 @@ ${JSON.stringify(Ze(),null,2)}`;navigator.share?navigator.share({text:i}).catch(
           gap:8px; align-items:stretch; }
         .boost { position:relative; flex:1; height:76px; cursor:pointer; padding:0;
           display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:inherit;
-          background:linear-gradient(#453e63, #322c47); border:2px solid rgba(255,255,255,.45); border-radius:16px;
-          box-shadow:0 4px 0 rgba(10,5,30,.45), 0 7px 12px rgba(10,5,30,.3), inset 0 2px 0 rgba(255,255,255,.16); }
+          background:linear-gradient(#41537f, #2c3a61 55%, #253251); border:2px solid #17203a; border-radius:16px;
+          box-shadow:0 4px 0 #10182c, 0 7px 12px rgba(5,8,20,.4), inset 0 2px 0 rgba(255,255,255,.24); }
         .boost:active:not(:disabled) { transform:translateY(3px) scale(.96);
           box-shadow:0 1px 0 rgba(10,5,30,.45), inset 0 2px 0 rgba(255,255,255,.16); }
         .boost .badge { position:absolute; top:-9px; right:-7px; color:#fff; min-width:18px; z-index:1;
@@ -379,8 +381,11 @@ ${JSON.stringify(Ze(),null,2)}`;navigator.share?navigator.share({text:i}).catch(
         .coinpill img { width:16px !important; height:16px !important; }
         /* the NUMBERS carry the contrast (Pixel Flow rule): big, chunky, outlined */
         #coinpill-val { font-size:16px; color:#ffd21c; text-shadow:0 1px 0 rgba(0,0,0,.55); }
-        .movesb .num { font-size:42px; flex:1; display:flex; align-items:center; justify-content:center;
-          color:#333a63; text-shadow:0 2px 0 rgba(255,255,255,.55); }
+        .movesb .num { font-size:44px; flex:1; display:flex; align-items:center; justify-content:center;
+          color:#fff;
+          text-shadow:-2.5px 0 0 #17203a, 2.5px 0 0 #17203a, 0 -2.5px 0 #17203a, 0 2.5px 0 #17203a,
+            -1.8px -1.8px 0 #17203a, 1.8px -1.8px 0 #17203a, -1.8px 1.8px 0 #17203a, 1.8px 1.8px 0 #17203a,
+            0 5px 0 #10182c, 0 8px 10px rgba(0,0,0,.35); }
         .minusone { right:-10px; }
         .tchip .cnt { font-size:15px;
           text-shadow:-1.5px 0 0 rgba(10,8,25,.7), 1.5px 0 0 rgba(10,8,25,.7), 0 -1.5px 0 rgba(10,8,25,.7),
