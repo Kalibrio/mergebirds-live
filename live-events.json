@@ -1,0 +1,13 @@
+{
+  "events": [
+    {
+      "id": "gold-rush-w31",
+      "title": "GOLD RUSH",
+      "icon": "⚡",
+      "start": "2026-07-30",
+      "end": "2026-08-02",
+      "type": "gold_rush",
+      "mult": 2
+    }
+  ]
+}
