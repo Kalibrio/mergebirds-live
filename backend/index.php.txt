@@ -1,0 +1,112 @@
+<?php
+// Birdwatch v1 on DreamHost shared (PHP): same HTTP contract as server.mjs
+// so a later move to AWS is invisible to the game client.
+//   POST /e            -> append events to JSONL (above docroot)
+//   POST /race/join    -> daily 8-player shard, returns members
+//   POST /race/score   -> monotonic points, returns members
+//   GET  /rollup?token -> 14-day per-level funnel + 30-day DAU
+//   GET  /             -> health
+// Routing via .htaccess rewrite: everything lands here with PATH in ?p=.
+
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: content-type');
+header('Content-Type: application/json');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+
+$DATA = dirname($_SERVER['DOCUMENT_ROOT'] ?: __DIR__) . '/mb-data';
+if (!is_dir($DATA)) mkdir($DATA, 0755, true);
+$TOKEN_FILE = "$DATA/rollup-token.txt";
+$path = '/' . trim($_GET['p'] ?? '', '/');
+
+function body_json() {
+  $raw = file_get_contents('php://input', false, null, 0, 512 * 1024);
+  $j = json_decode($raw, true);
+  return is_array($j) ? $j : null;
+}
+function fail($code, $msg) { http_response_code($code); echo json_encode(['error' => $msg]); exit; }
+
+if ($path === '/' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+  echo json_encode(['ok' => true, 'store' => 'jsonl']); exit;
+}
+
+if ($path === '/e' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+  $b = body_json();
+  if (!$b || empty($b['did']) || !is_array($b['ev'] ?? null)) fail(400, 'bad request');
+  $did = substr((string)$b['did'], 0, 64);
+  $sid = substr((string)($b['sid'] ?? ''), 0, 64);
+  $lines = '';
+  $n = 0;
+  foreach (array_slice($b['ev'], 0, 500) as $e) {
+    if (!is_array($e) || empty($e['e'])) continue;
+    $lines .= json_encode([
+      'did' => $did, 'sid' => $sid,
+      't' => (int)($e['t'] ?? round(microtime(true) * 1000)),
+      'e' => substr((string)$e['e'], 0, 48),
+      'p' => is_array($e['p'] ?? null) ? $e['p'] : [],
+    ]) . "\n";
+    $n++;
+  }
+  if ($n) file_put_contents("$DATA/events-" . gmdate('Y-m') . '.jsonl', $lines, FILE_APPEND | LOCK_EX);
+  echo json_encode(['ok' => true, 'n' => $n]); exit;
+}
+
+if (($path === '/race/join' || $path === '/race/score') && $_SERVER['REQUEST_METHOD'] === 'POST') {
+  $b = body_json();
+  if (!$b || empty($b['did']) || empty($b['day']) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $b['day'])) fail(400, 'bad request');
+  $did = substr((string)$b['did'], 0, 64);
+  $name = substr(trim((string)($b['name'] ?? '')), 0, 14) ?: 'bird';
+  $file = "$DATA/race-{$b['day']}.json";
+  $fh = fopen($file, 'c+');
+  if (!$fh) fail(500, 'storage');
+  flock($fh, LOCK_EX);
+  $raw = stream_get_contents($fh);
+  $shards = json_decode($raw ?: '[]', true) ?: [];
+  // find the member's shard, else first with room, else a new one
+  $si = null;
+  foreach ($shards as $i => $s) if (isset($s[$did])) { $si = $i; break; }
+  if ($si === null) foreach ($shards as $i => $s) if (count($s) < 8) { $si = $i; break; }
+  if ($si === null) { $shards[] = []; $si = count($shards) - 1; }
+  if (!isset($shards[$si][$did])) $shards[$si][$did] = ['name' => $name, 'pts' => 0];
+  else $shards[$si][$did]['name'] = $name;
+  if ($path === '/race/score') {
+    $pts = min(400, max(0, (int)($b['pts'] ?? 0))); // daily cap + monotonic
+    if ($pts > $shards[$si][$did]['pts']) $shards[$si][$did]['pts'] = $pts;
+  }
+  ftruncate($fh, 0); rewind($fh);
+  fwrite($fh, json_encode($shards));
+  flock($fh, LOCK_UN); fclose($fh);
+  $members = [];
+  foreach ($shards[$si] as $mdid => $m) $members[] = ['did' => $mdid, 'name' => $m['name'], 'pts' => $m['pts']];
+  echo json_encode(['members' => $members]); exit;
+}
+
+if ($path === '/rollup' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+  $token = file_exists($TOKEN_FILE) ? trim(file_get_contents($TOKEN_FILE)) : '';
+  if (!$token || ($_GET['token'] ?? '') !== $token) fail(403, 'forbidden');
+  $since = (time() - 14 * 86400) * 1000;
+  $funnel = []; $daily = [];
+  foreach ([gmdate('Y-m'), gmdate('Y-m', strtotime('-1 month'))] as $month) {
+    $f = "$DATA/events-$month.jsonl";
+    if (!file_exists($f)) continue;
+    $fh = fopen($f, 'r');
+    while (($line = fgets($fh)) !== false) {
+      $e = json_decode($line, true);
+      if (!$e) continue;
+      $day = gmdate('Y-m-d', (int)($e['t'] / 1000));
+      $daily[$day]['events'] = ($daily[$day]['events'] ?? 0) + 1;
+      $daily[$day]['dids'][$e['did']] = 1;
+      if ($e['t'] < $since || !isset($e['p']['level'])) continue;
+      $lvl = (int)$e['p']['level'];
+      $k = ['level_start' => 'starts', 'level_win' => 'wins', 'level_fail' => 'fails', 'continue_bought' => 'continues'][$e['e']] ?? null;
+      if ($k) $funnel[$lvl][$k] = ($funnel[$lvl][$k] ?? 0) + 1;
+    }
+    fclose($fh);
+  }
+  ksort($funnel); ksort($daily);
+  $frows = []; foreach ($funnel as $lvl => $r) $frows[] = ['level' => $lvl] + $r;
+  $drows = []; foreach ($daily as $day => $r) $drows[] = ['day' => $day, 'dau' => count($r['dids']), 'events' => $r['events']];
+  echo json_encode(['funnel' => $frows, 'daily' => $drows]); exit;
+}
+
+fail(404, 'not found');
