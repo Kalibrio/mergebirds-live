@@ -575,6 +575,81 @@ ${JSON.stringify(rt(),null,2)}`;navigator.share?navigator.share({text:s}).catch(
         .tut .digdot { width:26px; height:26px; margin:-96px auto 0; border-radius:50%;
           background:radial-gradient(circle at 35% 30%, #fff, #ffe066);
           box-shadow:0 0 20px rgba(255,255,255,.9); animation: tuthand 1.4s ease-in-out infinite; }
+
+        /* ============ BRAWL SKIN: the meta speaks Supercell ============
+           Rules: skewed parallelograms, hard #0d101f outlines + flat ledges,
+           flat saturated fills, yellow CTAs w/ dark text, orange = you/active */
+        .wallet { justify-content:flex-end; gap:7px; padding:10px 14px 8px; }
+        .wpill { background:#171b2e; border:2px solid #05070f; border-radius:9px; transform:skewX(-6deg);
+          box-shadow:0 3px 0 #05070f; padding:4px 13px; font-size:15px; text-shadow:0 1.5px 0 #000; }
+        .wpill img { transform:skewX(6deg); }
+        .tabbar { background:#171b2e; border-top:3px solid #05070f; gap:8px; padding:9px 12px 10px; }
+        .tab { border-radius:9px; transform:skewX(-6deg); background:#262b47; border:2.5px solid #0d101f;
+          color:#fff; box-shadow:0 3.5px 0 #0d101f; padding:6px 0 5px; }
+        .tab > * { transform:skewX(6deg); }
+        .tab img { opacity:.85; }
+        .tab span { font-size:11px; letter-spacing:1px; }
+        .tab.active { background:linear-gradient(#ffd94d, #ffce00); border-color:#0d101f; color:#4a2f00;
+          box-shadow:0 3.5px 0 #7a5a00; }
+        .tab.active span { color:#4a2f00; text-shadow:none; }
+        .tab.locked { opacity:.3; }
+        .tdot { top:2px; right:8px; }
+        .pane-inner .pass-box, #pane-race .pass-box, #pane-aviary .pass-box {
+          background:#262b47; border:2.5px solid #0d101f; border-radius:12px;
+          box-shadow:0 4px 0 #0d101f; padding:12px; margin:12px 2px; }
+        .pass-title { display:inline-block; background:linear-gradient(#ff9e3d, #ff8b1f); color:#fff;
+          padding:4px 14px 5px; border-radius:7px; transform:skewX(-8deg); border:2px solid #0d101f;
+          box-shadow:0 3px 0 #0d101f; font-size:13px; letter-spacing:1px; margin:-2px 0 10px;
+          text-shadow:0 1.5px 0 rgba(0,0,0,.45); }
+        .pass-title img { transform:skewX(8deg); }
+        .claimbtn { background:linear-gradient(#ffe14c, #ffce00); color:#5c3c00; border:2.5px solid #0d101f;
+          border-radius:8px; transform:skewX(-8deg); box-shadow:0 3.5px 0 #0d101f; text-shadow:none;
+          font-size:14px; padding:7px 16px; }
+        .claimbtn:active { transform:skewX(-8deg) translateY(2.5px); box-shadow:0 1px 0 #0d101f; }
+        .claimbtn:disabled { filter:none; background:#3a4060; color:#8b91ad; box-shadow:0 3.5px 0 #0d101f; }
+        .mrow { background:#20253d; border:2px solid #0d101f; border-radius:9px; padding:9px 12px;
+          margin:8px 0; box-shadow:0 3px 0 #0d101f; transform:skewX(-4deg); }
+        .mrow > * { transform:skewX(4deg); }
+        .qbar { position:relative; height:17px; background:#12152a; border:2px solid #0d101f;
+          border-radius:6px; overflow:hidden; margin-top:5px; }
+        .qbar .gq-fill { position:absolute; inset:0 auto 0 0; background:linear-gradient(#7ef27d, #38c94c); }
+        .qbar .qtext { position:relative; display:block; text-align:center; font-size:11px; line-height:15px;
+          color:#fff; text-shadow:0 1.5px 0 #000; letter-spacing:.5px; }
+        .streakrow .sday { background:#12152a; border:2px solid #0d101f; border-radius:7px;
+          transform:skewX(-4deg); color:#8b91ad; }
+        .sday.done { background:#1f5c2d; color:#7ef27d; }
+        .sday.today { border-color:#ffce00; color:#ffce00; }
+        .rrow { background:#20253d; border:2px solid #0d101f; border-radius:9px; padding:8px 12px;
+          margin:7px 0; transform:skewX(-4deg); box-shadow:0 3px 0 #0d101f; font-size:14px; }
+        .rrow > * { transform:skewX(4deg); }
+        .rrow .rrank { font-size:17px; width:22px; color:#fff; }
+        .rrow .rdot { width:26px; height:26px; border-radius:7px; border:2px solid #0d101f; }
+        .rrow .rsc { color:#ffd21c; opacity:1; }
+        .rrow.me { background:linear-gradient(#ff9e3d, #ff8b1f); color:#fff; }
+        .rrow.me .rrank, .rrow.me .rsc { color:#fff; text-shadow:0 1.5px 0 rgba(0,0,0,.4); }
+        .aviary-grid { gap:8px; }
+        .acell { background:#20253d !important; border-radius:9px; overflow:hidden; padding:8px 2px 0;
+          box-shadow:0 3px 0 #0d101f; }
+        .acell .aname { display:block; background:#12152a; margin:6px -2px 0; padding:3px 0 4px;
+          font-size:10px; letter-spacing:.5px; }
+        .acell .acount { top:2px; right:2px; border-radius:6px; }
+        .acell .ashiny { top:2px; left:3px; }
+        .pnode { background:#12152a; border:2px solid #0d101f; border-radius:7px; transform:skewX(-4deg); }
+        .pnode.due { background:#38c94c; }
+        .pnode.got { background:#1a1f36; opacity:.5; }
+        #passclaim, #home .endlessbtn { background:linear-gradient(#ffe14c, #ffce00); color:#5c3c00;
+          border:2.5px solid #0d101f; box-shadow:0 3px 0 #0d101f; transform:skewX(-6deg); text-shadow:none; }
+        .homeplay { background:linear-gradient(#ffe14c, #ffce00); color:#4a2f00; border:3px solid #0d101f;
+          box-shadow:0 6px 0 #0d101f, 0 10px 18px rgba(0,0,0,.4); text-shadow:none;
+          transform:translateX(-50%) skewX(-6deg); }
+        .homeplay:active { transform:translateX(-50%) skewX(-6deg) translateY(4px); box-shadow:0 2px 0 #0d101f; }
+        .junlock { background:#262b47; border:2.5px solid #0d101f; border-radius:9px;
+          box-shadow:0 3px 0 #0d101f; transform:skewX(-4deg); }
+        .junlock > * { transform:skewX(4deg); }
+        .goldiechip { background:#171b2e; border:2px solid #05070f; border-radius:8px; transform:skewX(-6deg);
+          box-shadow:0 2.5px 0 #05070f; }
+        .goldiechip img { transform:skewX(6deg); }
+        .hb-spot { border-style:solid; border-color:#0d101f; background:#262b47cc; }
       </style>
       <div class="race" id="race"></div>
       <div class="racechip" id="racechip"></div>
@@ -749,8 +824,9 @@ ${JSON.stringify(rt(),null,2)}`;navigator.share?navigator.share({text:s}).catch(
       </div>`,(f=this.root.querySelector("#streakclaim"))==null||f.addEventListener("click",()=>{this.cb.onClaimStreak()&&(this.refreshWallet(),this.renderMissionsPane(),this.renderBadges())});const e=Ve(),r=c=>{const u=c.reward.coins?`${c.reward.coins}${N("coin",12)}`:`${N(c.reward.booster,14)}+1`,o=c.done&&!c.claimed?`<button class="claimbtn clickable" data-mission="${c.id}">CLAIM</button>`:c.claimed?'<span style="color:#4ade80;font-size:16px">✓</span>':`<span style="color:#ffe066">${u}</span>`;return`
         <div class="mrow">
           <span class="mtxt" style="font-size:12px;">${c.label}
-            <div class="gq-bar" style="height:7px;margin-top:3px;">
+            <div class="qbar">
               <div class="gq-fill" style="width:${c.progress/c.goal*100}%"></div>
+              <span class="qtext">${c.progress}/${c.goal}</span>
             </div>
           </span>${o}
         </div>`};this.els["missions-list"].innerHTML=e.daily.map(r).join("")+`<div style="border-top:1px solid #ffffff33;margin-top:6px;padding-top:2px;">${r(e.weekly)}</div>`,this.els["missions-list"].querySelectorAll("[data-mission]").forEach(c=>{c.addEventListener("click",()=>{this.cb.onClaimMission(c.dataset.mission)&&(this.refreshWallet(),this.renderMissionsPane(),this.renderBadges())})}),this.renderPass()}renderWorldMap(){const n={egg:"egg",cage:"cage",relic:"relic",nest:"nest"},i=5,l=104,a=Math.ceil(pe.length/i),e=a*l+26,r=pe.map((d,h)=>{const v=Math.floor(h/i),x=h%i;return{x:12+(v%2===0?x:i-1-x)*76/(i-1),y:58+v*l}});let f=`M ${r[0].x} ${r[0].y}`;for(let d=1;d<r.length;d++){const h=r[d-1],v=r[d];f+=h.y===v.y?` L ${v.x} ${v.y}`:` C ${h.x+(h.x>50?13:-13)} ${h.y+l*.55}, ${v.x+(v.x>50?13:-13)} ${v.y-l*.55}, ${v.x} ${v.y}`}const c=Array.from({length:a},(d,h)=>`${Ke[pe[h*i].theme].skyBottom} ${Math.round(h/Math.max(1,a-1)*100)}%`).join(", "),u=Array.from({length:a},(d,h)=>{const v=h%2===0?78:22,x=14+h*l;return`<ellipse cx="${v}" cy="${x}" rx="11" ry="5" fill="rgba(255,255,255,.22)"/>
