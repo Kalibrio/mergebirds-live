@@ -565,7 +565,9 @@ ${JSON.stringify(Ke(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
           cursor:pointer; animation:pulse2 .8s infinite alternate; text-shadow:none;
           box-shadow:0 4px 0 rgba(120,80,0,.4), 0 0 20px rgba(255,212,59,.7), inset 0 2px 2px rgba(255,255,255,.5); }
         .jnode.lock { opacity:.4; }
-        .jnode .you { position:absolute; top:-27px; left:50%; margin-left:-14px; width:28px; height:28px;
+        .youcrown { position:absolute; top:-58px; left:50%; transform:translateX(-50%); font-size:15px;
+          text-shadow:0 2px 3px rgba(0,0,0,.5); pointer-events:none; }
+        .jnode .you { position:absolute; top:-46px; left:50%; margin-left:-23px; width:46px; height:46px;
           animation: youBob 1s ease-in-out infinite; pointer-events:none;
           filter: drop-shadow(0 2px 3px rgba(0,0,0,.4)); }
         @keyframes youBob { 50% { transform: translateY(-5px); } }
@@ -1147,10 +1149,10 @@ ${JSON.stringify(Ke(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
               <span class="qtext">${g.progress}/${g.goal}</span>
             </div>
           </span>${h}
-        </div>`};this.els["missions-list"].innerHTML=l.daily.map(c).join("")+`<div style="border-top:1px solid #ffffff33;margin-top:6px;padding-top:2px;">${c(l.weekly)}</div>`,this.els["missions-list"].querySelectorAll("[data-mission]").forEach(g=>{g.addEventListener("click",()=>{this.cb.onClaimMission(g.dataset.mission)&&(this.refreshWallet(),this.renderMissionsPane(),this.renderBadges())})}),this.renderPass()}static roadX(i){return 50+24*Math.sin(i*.62)*Math.cos(i*.13)}static project(i){const s=i*.26;return s<-1.35||s>1.5?{p:0,y:2}:{p:Math.max(0,Math.cos(s)*(1-.52*Math.sin(s))),y:.66-.52*Math.sin(s)}}renderWorldMap(){this.mapCam=this.currentLevelNumber,this.buildCorridor()}buildCorridor(){const i={egg:"egg",cage:"cage",relic:"relic",nest:"nest"},s=Math.max(1,Math.min(ce.length,Math.round(this.mapCam)));this.mapBuiltAt=s;const n=Math.max(1,s-6),a=Math.min(ce.length,s+9),t=new Set(this.save.habitat),l=Le.find(r=>!t.has(r.id)),c=ps(s),d=Math.floor((s-1)/15),g=[];for(let r=n;r<=a;r++){const f=ce[r-1],u=r<=this.save.levelCompleted?"done":r===this.save.levelCompleted+1?"cur":"lock",m=this.save.stars[r]??0,x=i[f.winCondition],w=r<=this.save.levelCompleted+1;g.push(`
+        </div>`};this.els["missions-list"].innerHTML=l.daily.map(c).join("")+`<div style="border-top:1px solid #ffffff33;margin-top:6px;padding-top:2px;">${c(l.weekly)}</div>`,this.els["missions-list"].querySelectorAll("[data-mission]").forEach(g=>{g.addEventListener("click",()=>{this.cb.onClaimMission(g.dataset.mission)&&(this.refreshWallet(),this.renderMissionsPane(),this.renderBadges())})}),this.renderPass()}static roadX(i){return 50+24*Math.sin(i*.62)*Math.cos(i*.13)}static project(i){const s=i*.26;return s<-1.35||s>1.5?{p:0,y:2}:{p:Math.max(0,Math.cos(s)*(1-.52*Math.sin(s))),y:.66-.52*Math.sin(s)}}markerBirdHTML(i){const s=Math.floor((i-1)/15),n=s%10,a=s>=20?"💎":s>=10?"👑":"";return this.liveBirdHTML(n,void 0,"you")+(a?`<span class="youcrown">${a}</span>`:"")}renderWorldMap(){this.mapCam=this.currentLevelNumber,this.buildCorridor()}buildCorridor(){const i={egg:"egg",cage:"cage",relic:"relic",nest:"nest"},s=Math.max(1,Math.min(ce.length,Math.round(this.mapCam)));this.mapBuiltAt=s;const n=Math.max(1,s-6),a=Math.min(ce.length,s+9),t=new Set(this.save.habitat),l=Le.find(r=>!t.has(r.id)),c=ps(s),d=Math.floor((s-1)/15),g=[];for(let r=n;r<=a;r++){const f=ce[r-1],u=r<=this.save.levelCompleted?"done":r===this.save.levelCompleted+1?"cur":"lock",m=this.save.stars[r]??0,x=i[f.winCondition],w=r<=this.save.levelCompleted+1;g.push(`
         <button class="jnode ${u} ${f.hard?"hardn":""} ${u!=="lock"?"clickable":""}"
           data-lvl="${r}" data-cn="${r}" ${u==="lock"?"disabled":""}>
-          ${u==="cur"?this.liveBirdHTML(2,void 0,"you"):""}
+          ${u==="cur"?this.markerBirdHTML(r):""}
           ${(this.save.crownRank[r]??0)>0?`<span class="jcrown r${this.save.crownRank[r]}">${this.save.crownRank[r]>=3?"💎":"👑"}</span>`:""}
           ${w?r:""}
           ${x?`<img class="jmark" src="${ie(x)}">`:""}
