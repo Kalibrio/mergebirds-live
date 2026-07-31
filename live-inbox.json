@@ -1,0 +1,10 @@
+{
+  "messages": [
+    {
+      "id": "welcome-2026-07",
+      "title": "Welcome to the valley! 🐦",
+      "body": "The birds have been expecting you. Here's a little something to get your nest started.",
+      "gift": { "coins": 200, "gems": 5 }
+    }
+  ]
+}
