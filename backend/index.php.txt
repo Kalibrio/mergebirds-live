@@ -111,6 +111,49 @@ if ($path === '/race/week' && $_SERVER['REQUEST_METHOD'] === 'GET') {
   echo json_encode(['week' => $rows, 'me' => $me]); exit;
 }
 
+if ($path === '/stripe/redeem' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+  // IAP fulfillment: the game returns from Stripe checkout with a session id;
+  // we verify it against Stripe's API (secret key stays in ~/mb-data, never
+  // in the public bundle) and pay the gem grant exactly once.
+  $b = body_json();
+  $sid = preg_replace('/[^a-zA-Z0-9_]/', '', (string)($b['sid'] ?? ''));
+  if (strlen($sid) < 10) fail(400, 'bad request');
+  $keyf = "$DATA/stripe-key.txt";
+  if (!file_exists($keyf)) fail(503, 'iap not configured');
+  $key = trim(file_get_contents($keyf));
+  $ledger = "$DATA/stripe-redeemed.jsonl";
+  $lh = fopen($ledger, 'c+');
+  if (!$lh) fail(500, 'storage');
+  flock($lh, LOCK_EX);
+  if (strpos(stream_get_contents($lh) ?: '', "\"$sid\"") !== false) {
+    flock($lh, LOCK_UN); fclose($lh); fail(409, 'already redeemed');
+  }
+  $ch = curl_init('https://api.stripe.com/v1/checkout/sessions/' . $sid);
+  curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => ["Authorization: Bearer $key"],
+    CURLOPT_TIMEOUT => 10,
+  ]);
+  $res = curl_exec($ch);
+  $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  curl_close($ch);
+  $s = json_decode($res ?: '', true);
+  if ($code !== 200 || !$s) { flock($lh, LOCK_UN); fclose($lh); fail(502, 'stripe error'); }
+  if (($s['payment_status'] ?? '') !== 'paid') { flock($lh, LOCK_UN); fclose($lh); fail(402, 'not paid'); }
+  // amount → gems map lives server-side so a tampered client can't invent SKUs
+  $map = json_decode(@file_get_contents("$DATA/stripe-skus.json") ?: '{}', true) ?: [];
+  $gems = (int)($map[(string)($s['amount_total'] ?? 0)] ?? 0);
+  if (!$gems) { flock($lh, LOCK_UN); fclose($lh); fail(422, 'unknown pack'); }
+  fseek($lh, 0, SEEK_END);
+  fwrite($lh, json_encode([
+    'sid' => $sid, 'gems' => $gems, 't' => time(),
+    'did' => substr((string)($s['client_reference_id'] ?? ''), 0, 64),
+    'cents' => (int)($s['amount_total'] ?? 0),
+  ]) . "\n");
+  flock($lh, LOCK_UN); fclose($lh);
+  echo json_encode(['ok' => true, 'gems' => $gems]); exit;
+}
+
 if (($path === '/flock/create' || $path === '/flock/join') && $_SERVER['REQUEST_METHOD'] === 'POST') {
   // Flocks: tiny teams. People quit games; they don't quit people.
   $b = body_json();
