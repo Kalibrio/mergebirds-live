@@ -62,9 +62,14 @@ if (($path === '/race/join' || $path === '/race/score') && $_SERVER['REQUEST_MET
   flock($fh, LOCK_EX);
   $raw = stream_get_contents($fh);
   $shards = json_decode($raw ?: '[]', true) ?: [];
-  // find the member's shard, else first with room, else a new one
+  // find the member's shard; else honor a challenge link's preferred shard
+  // (that's how two friends land in the SAME race); else first with room
   $si = null;
   foreach ($shards as $i => $s) if (isset($s[$did])) { $si = $i; break; }
+  if ($si === null && isset($b['shard'])) {
+    $want = (int)$b['shard'];
+    if (isset($shards[$want]) && count($shards[$want]) < 8) $si = $want;
+  }
   if ($si === null) foreach ($shards as $i => $s) if (count($s) < 8) { $si = $i; break; }
   if ($si === null) { $shards[] = []; $si = count($shards) - 1; }
   if (!isset($shards[$si][$did])) $shards[$si][$did] = ['name' => $name, 'pts' => 0];
@@ -78,15 +83,40 @@ if (($path === '/race/join' || $path === '/race/score') && $_SERVER['REQUEST_MET
   flock($fh, LOCK_UN); fclose($fh);
   $members = [];
   foreach ($shards[$si] as $mdid => $m) $members[] = ['did' => $mdid, 'name' => $m['name'], 'pts' => $m['pts']];
-  echo json_encode(['members' => $members]); exit;
+  echo json_encode(['members' => $members, 'shard' => $si]); exit;
+}
+
+if ($path === '/race/week' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+  // weekly leaderboard: sum each device's daily points over the last 7 days
+  $totals = [];
+  for ($i = 0; $i < 7; $i++) {
+    $day = gmdate('Y-m-d', strtotime("-$i day"));
+    $f = "$DATA/race-$day.json";
+    if (!file_exists($f)) continue;
+    $shards = json_decode(file_get_contents($f), true) ?: [];
+    foreach ($shards as $s) foreach ($s as $did => $m) {
+      if (!isset($totals[$did])) $totals[$did] = ['name' => $m['name'], 'pts' => 0];
+      $totals[$did]['pts'] += (int)$m['pts'];
+      if (!empty($m['name'])) $totals[$did]['name'] = $m['name'];
+    }
+  }
+  uasort($totals, fn($a, $b) => $b['pts'] - $a['pts']);
+  $rows = []; $rank = 0; $me = null;
+  $mydid = substr((string)($_GET['did'] ?? ''), 0, 64);
+  foreach ($totals as $did => $m) {
+    $rank++;
+    if ($rank <= 20) $rows[] = ['rank' => $rank, 'did' => $did, 'name' => $m['name'], 'pts' => $m['pts']];
+    if ($did === $mydid) $me = ['rank' => $rank, 'pts' => $m['pts']];
+  }
+  echo json_encode(['week' => $rows, 'me' => $me]); exit;
 }
 
 if ($path === '/rollup' && $_SERVER['REQUEST_METHOD'] === 'GET') {
   $token = file_exists($TOKEN_FILE) ? trim(file_get_contents($TOKEN_FILE)) : '';
   if (!$token || ($_GET['token'] ?? '') !== $token) fail(403, 'forbidden');
   $since = (time() - 14 * 86400) * 1000;
-  $funnel = []; $daily = [];
-  foreach ([gmdate('Y-m'), gmdate('Y-m', strtotime('-1 month'))] as $month) {
+  $funnel = []; $daily = []; $players = []; // did -> ['first' => day, 'days' => set]
+  foreach ([gmdate('Y-m'), gmdate('Y-m', strtotime('-1 month')), gmdate('Y-m', strtotime('-2 month'))] as $month) {
     $f = "$DATA/events-$month.jsonl";
     if (!file_exists($f)) continue;
     $fh = fopen($f, 'r');
@@ -96,17 +126,60 @@ if ($path === '/rollup' && $_SERVER['REQUEST_METHOD'] === 'GET') {
       $day = gmdate('Y-m-d', (int)($e['t'] / 1000));
       $daily[$day]['events'] = ($daily[$day]['events'] ?? 0) + 1;
       $daily[$day]['dids'][$e['did']] = 1;
+      // cohorts: first-seen day + every active day, per device
+      if (!isset($players[$e['did']])) $players[$e['did']] = ['first' => $day, 'days' => []];
+      if ($day < $players[$e['did']]['first']) $players[$e['did']]['first'] = $day;
+      $players[$e['did']]['days'][$day] = 1;
       if ($e['t'] < $since || !isset($e['p']['level'])) continue;
       $lvl = (int)$e['p']['level'];
-      $k = ['level_start' => 'starts', 'level_win' => 'wins', 'level_fail' => 'fails', 'continue_bought' => 'continues'][$e['e']] ?? null;
+      $k = ['level_start' => 'starts', 'level_win' => 'wins', 'level_fail' => 'fails',
+            'continue_bought' => 'continues', 'level_quit' => 'quits',
+            'booster_used' => 'boosters'][$e['e']] ?? null;
       if ($k) $funnel[$lvl][$k] = ($funnel[$lvl][$k] ?? 0) + 1;
+      if ($e['e'] === 'level_win' && isset($e['p']['moves_left'])) {
+        $funnel[$lvl]['ml_sum'] = ($funnel[$lvl]['ml_sum'] ?? 0) + (int)$e['p']['moves_left'];
+        $funnel[$lvl]['ml_n'] = ($funnel[$lvl]['ml_n'] ?? 0) + 1;
+      }
     }
     fclose($fh);
   }
   ksort($funnel); ksort($daily);
-  $frows = []; foreach ($funnel as $lvl => $r) $frows[] = ['level' => $lvl] + $r;
+  $frows = [];
+  foreach ($funnel as $lvl => $r) {
+    if (($r['ml_n'] ?? 0) > 0) $r['moves_left_avg'] = round($r['ml_sum'] / $r['ml_n'], 1);
+    unset($r['ml_sum'], $r['ml_n']);
+    $frows[] = ['level' => $lvl] + $r;
+  }
   $drows = []; foreach ($daily as $day => $r) $drows[] = ['day' => $day, 'dau' => count($r['dids']), 'events' => $r['events']];
-  echo json_encode(['funnel' => $frows, 'daily' => $drows]); exit;
+  // D1/D7 retention: of devices first seen on day X (old enough to qualify),
+  // how many came back exactly 1 / 7 days later
+  $d1 = ['n' => 0, 'ret' => 0]; $d7 = ['n' => 0, 'ret' => 0];
+  $today = gmdate('Y-m-d');
+  foreach ($players as $p) {
+    $f1 = gmdate('Y-m-d', strtotime($p['first'] . ' +1 day'));
+    $f7 = gmdate('Y-m-d', strtotime($p['first'] . ' +7 day'));
+    if ($f1 < $today) { $d1['n']++; if (isset($p['days'][$f1])) $d1['ret']++; }
+    if ($f7 < $today) { $d7['n']++; if (isset($p['days'][$f7])) $d7['ret']++; }
+  }
+  // KPI computation against the wall targets
+  $wins = 0; $failsN = 0; $hardWins = 0; $hardFails = 0; $conts = 0;
+  foreach ($funnel as $lvl => $r) {
+    $isHard = $lvl > 40 && $lvl % 10 === 9;
+    if ($isHard) { $hardWins += $r['wins'] ?? 0; $hardFails += $r['fails'] ?? 0; }
+    else { $wins += $r['wins'] ?? 0; $failsN += $r['fails'] ?? 0; }
+    $conts += $r['continues'] ?? 0;
+  }
+  $kpis = [
+    'players' => count($players),
+    'd1' => $d1['n'] ? round($d1['ret'] / $d1['n'] * 100) : null,
+    'd1_n' => $d1['n'],
+    'd7' => $d7['n'] ? round($d7['ret'] / $d7['n'] * 100) : null,
+    'd7_n' => $d7['n'],
+    'fail_rate' => ($wins + $failsN) ? round($failsN / ($wins + $failsN) * 100) : null,
+    'hard_fail_rate' => ($hardWins + $hardFails) ? round($hardFails / ($hardWins + $hardFails) * 100) : null,
+    'continue_rate' => ($failsN + $hardFails) ? round($conts / ($failsN + $hardFails) * 100) : null,
+  ];
+  echo json_encode(['funnel' => $frows, 'daily' => $drows, 'kpis' => $kpis]); exit;
 }
 
 fail(404, 'not found');

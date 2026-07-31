@@ -8,6 +8,34 @@
       "end": "2026-08-02",
       "type": "gold_rush",
       "mult": 2
+    },
+    {
+      "id": "shiny-hunt-w32",
+      "title": "SHINY HUNT",
+      "icon": "✨",
+      "start": "2026-08-03",
+      "end": "2026-08-09",
+      "type": "collection",
+      "goal": 3,
+      "reward": 12
+    },
+    {
+      "id": "digathon-w33",
+      "title": "DIG-A-THON",
+      "icon": "⛏",
+      "start": "2026-08-10",
+      "end": "2026-08-16",
+      "type": "digathon",
+      "goal": 6000,
+      "reward": 10
+    },
+    {
+      "id": "season-close-aug",
+      "title": "SEASON FINALE",
+      "icon": "🏁",
+      "start": "2026-08-28",
+      "end": "2026-08-31",
+      "type": "season_close"
     }
   ]
 }
