@@ -6,7 +6,7 @@ const CACHE = 'mb-shell-v2';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['icon.png', 'manifest.webmanifest'])));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['icon.png', 'logo.png', 'manifest.webmanifest'])));
 });
 
 self.addEventListener('activate', (e) => {
