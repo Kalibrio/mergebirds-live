@@ -111,6 +111,54 @@ if ($path === '/race/week' && $_SERVER['REQUEST_METHOD'] === 'GET') {
   echo json_encode(['week' => $rows, 'me' => $me]); exit;
 }
 
+if (($path === '/flock/create' || $path === '/flock/join') && $_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Flocks: tiny teams. People quit games; they don't quit people.
+  $b = body_json();
+  if (!$b || empty($b['did'])) fail(400, 'bad request');
+  $did = substr((string)$b['did'], 0, 64);
+  $pname = substr(trim((string)($b['name'] ?? '')), 0, 14) ?: 'bird';
+  if ($path === '/flock/create') {
+    $fname = substr(trim((string)($b['flock'] ?? '')), 0, 20) ?: 'The Flock';
+    $code = strtoupper(substr(str_replace(['+','/','='], '', base64_encode(random_bytes(6))), 0, 5));
+    $flock = ['name' => $fname, 'members' => [$did => ['name' => $pname]]];
+    file_put_contents("$DATA/flock-$code.json", json_encode($flock), LOCK_EX);
+  } else {
+    $code = strtoupper(preg_replace('/[^A-Z0-9]/i', '', (string)($b['code'] ?? '')));
+    if (strlen($code) < 3) fail(400, 'bad code');
+    $f = "$DATA/flock-$code.json";
+    if (!file_exists($f)) fail(404, 'no such flock');
+    $flock = json_decode(file_get_contents($f), true);
+    if (!$flock) fail(500, 'storage');
+    if (count($flock['members']) >= 30 && !isset($flock['members'][$did])) fail(409, 'flock full');
+    $flock['members'][$did] = ['name' => $pname];
+    file_put_contents($f, json_encode($flock), LOCK_EX);
+  }
+  echo json_encode(['code' => $code, 'name' => $flock['name'],
+    'members' => array_map(fn($m) => $m['name'], $flock['members'])]); exit;
+}
+
+if ($path === '/flock' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+  // flock standings: each member's race points summed over the last 7 days
+  $code = strtoupper(preg_replace('/[^A-Z0-9]/i', '', (string)($_GET['code'] ?? '')));
+  $f = "$DATA/flock-$code.json";
+  if (!file_exists($f)) fail(404, 'no such flock');
+  $flock = json_decode(file_get_contents($f), true) ?: fail(500, 'storage');
+  $pts = [];
+  for ($i = 0; $i < 7; $i++) {
+    $day = gmdate('Y-m-d', strtotime("-$i day"));
+    $rf = "$DATA/race-$day.json";
+    if (!file_exists($rf)) continue;
+    foreach (json_decode(file_get_contents($rf), true) ?: [] as $s)
+      foreach ($s as $mdid => $m)
+        if (isset($flock['members'][$mdid])) $pts[$mdid] = ($pts[$mdid] ?? 0) + (int)$m['pts'];
+  }
+  $rows = [];
+  foreach ($flock['members'] as $mdid => $m)
+    $rows[] = ['did' => $mdid, 'name' => $m['name'], 'pts' => $pts[$mdid] ?? 0];
+  usort($rows, fn($a, $b) => $b['pts'] - $a['pts']);
+  echo json_encode(['code' => $code, 'name' => $flock['name'], 'members' => $rows]); exit;
+}
+
 if ($path === '/rollup' && $_SERVER['REQUEST_METHOD'] === 'GET') {
   $token = file_exists($TOKEN_FILE) ? trim(file_get_contents($TOKEN_FILE)) : '';
   if (!$token || ($_GET['token'] ?? '') !== $token) fail(403, 'forbidden');

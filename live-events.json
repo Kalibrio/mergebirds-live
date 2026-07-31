@@ -1,10 +1,26 @@
 {
   "events": [
     {
+      "id": "founding-day",
+      "title": "FOUNDING DAY",
+      "icon": "🎂",
+      "recurYearly": {
+        "month": 7,
+        "day": 30,
+        "days": 3
+      },
+      "type": "collection",
+      "goal": 2,
+      "reward": 30
+    },
+    {
       "id": "gold-rush",
       "title": "GOLD RUSH",
       "icon": "⚡",
-      "recur": { "dow": 5, "days": 3 },
+      "recur": {
+        "dow": 5,
+        "days": 3
+      },
       "type": "gold_rush",
       "mult": 2
     },
@@ -29,12 +45,14 @@
       "reward": 10
     },
     {
-      "id": "season-close-aug",
+      "id": "season-finale",
       "title": "SEASON FINALE",
       "icon": "🏁",
-      "start": "2026-08-28",
-      "end": "2026-08-31",
-      "type": "season_close"
+      "recurMonthly": {
+        "lastDays": 3
+      },
+      "type": "gold_rush",
+      "mult": 3
     }
   ]
 }
