@@ -1,26 +1,33 @@
 // Merge Birds service worker: network-first with cache fallback.
-// The game is one self-contained file, so this is all it takes for full
-// offline play — fresh deploys still land immediately (network wins when up).
-const CACHE = 'mb-shell-v1';
+// v2: navigations fetch with cache:'no-cache' so a stale HTTP-cached HTML
+// (the July 31 inliner incident) can never be resurrected; old cache
+// versions are purged on activate.
+const CACHE = 'mb-shell-v2';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['./', 'icon.png', 'manifest.webmanifest'])));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['icon.png', 'manifest.webmanifest'])));
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(self.clients.claim());
+  e.waitUntil((async () => {
+    for (const k of await caches.keys()) if (k !== CACHE) await caches.delete(k);
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
+  const isNav = e.request.mode === 'navigate';
   e.respondWith(
-    fetch(e.request)
+    fetch(isNav ? new Request(e.request.url, { cache: 'no-cache' }) : e.request)
       .then((r) => {
-        const copy = r.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        if (r.ok) {
+          const copy = r.clone();
+          caches.open(CACHE).then((c) => c.put(e.request.url, copy)).catch(() => { /* opaque */ });
+        }
         return r;
       })
-      .catch(() => caches.match(e.request, { ignoreSearch: true }).then((hit) => hit ?? Response.error())),
+      .catch(() => caches.match(e.request.url, { ignoreSearch: true }).then((hit) => hit ?? Response.error())),
   );
 });
