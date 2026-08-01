@@ -263,7 +263,7 @@ ${JSON.stringify(Ke(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
         .acell .acount { position:absolute; top:-6px; right:-4px; background:#ffd43b; color:#5c3c00; font-size:16px;
           border-radius:8px; min-width:16px; padding:0 3px; line-height:16px; }
         .acell.gold { background:linear-gradient(#8a6d1a,#5c4a12); box-shadow:0 0 10px #ffd43b66; }
-        .newbird { position:absolute; top:220px; left:50%; transform:translateX(-50%); width:250px;
+        .newbird { position:absolute; top:calc(190px + var(--safe-top, 0px)); left:50%; transform:translateX(-50%); width:250px;
           background:linear-gradient(#41b3c4, #2a8d9d 40%, #227d8c);
           border:3px solid rgba(255,255,255,.5); border-radius:22px; padding:18px 14px; text-align:center;
           box-shadow:0 8px 0 rgba(10,25,50,.3), 0 18px 40px rgba(10,5,30,.55), inset 0 3px 0 rgba(255,255,255,.35),
@@ -278,7 +278,7 @@ ${JSON.stringify(Ke(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
         .newbird .nb2 { font-size:30px; }
         .newbird .nbsoul { font-size:18.5px; color:#ffe066; font-style:italic; margin-top:3px; opacity:.95; }
         .newbird.out { animation: nbout .3s ease forwards; }
-        .newbird.high { top:26px; } /* card screens: banner rides above the card, never over its content */
+.newbird.high { top:calc(26px + var(--safe-top, 0px)); } /* rides above the card AND below the notch */
         @keyframes nbin { 0% { transform:translateX(-50%) scale(0); } 100% { transform:translateX(-50%) scale(1); } }
         @keyframes nbout { to { transform:translateX(-50%) scale(0); opacity:0; } }
         .tut { position:absolute; left:50%; top:330px; width:200px; margin-left:-100px; text-align:center;
