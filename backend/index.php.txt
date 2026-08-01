@@ -221,6 +221,14 @@ if ($path === '/rollup' && $_SERVER['REQUEST_METHOD'] === 'GET') {
       if (!isset($players[$e['did']])) $players[$e['did']] = ['first' => $day, 'days' => []];
       if ($day < $players[$e['did']]['first']) $players[$e['did']]['first'] = $day;
       $players[$e['did']]['days'][$day] = 1;
+      // UA attribution: first-touch source rides on session_start; engaged =
+      // won level 1 — the per-campaign columns the CPI test reads
+      if ($e['e'] === 'session_start' && !empty($e['p']['source'])) {
+        $players[$e['did']]['src'] = substr((string)$e['p']['source'], 0, 32)
+          . (!empty($e['p']['campaign']) ? '/' . substr((string)$e['p']['campaign'], 0, 32) : '');
+      }
+      if ($e['e'] === 'level_win' && (int)($e['p']['level'] ?? 0) === 1) $players[$e['did']]['engaged'] = 1;
+      if ($e['e'] === 'install') $players[$e['did']]['installed'] = 1;
       if ($e['t'] < $since || !isset($e['p']['level'])) continue;
       $lvl = (int)$e['p']['level'];
       $k = ['level_start' => 'starts', 'level_win' => 'wins', 'level_fail' => 'fails',
@@ -270,7 +278,24 @@ if ($path === '/rollup' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     'hard_fail_rate' => ($hardWins + $hardFails) ? round($hardFails / ($hardWins + $hardFails) * 100) : null,
     'continue_rate' => ($failsN + $hardFails) ? round($conts / ($failsN + $hardFails) * 100) : null,
   ];
-  echo json_encode(['funnel' => $frows, 'daily' => $drows, 'kpis' => $kpis]); exit;
+  // per-source UA table: players / engaged / installs / D1 per campaign
+  $bySrc = [];
+  foreach ($players as $p) {
+    $src = $p['src'] ?? 'organic';
+    if (!isset($bySrc[$src])) $bySrc[$src] = ['players' => 0, 'engaged' => 0, 'installs' => 0, 'd1n' => 0, 'd1r' => 0];
+    $bySrc[$src]['players']++;
+    if (!empty($p['engaged'])) $bySrc[$src]['engaged']++;
+    if (!empty($p['installed'])) $bySrc[$src]['installs']++;
+    $f1 = gmdate('Y-m-d', strtotime($p['first'] . ' +1 day'));
+    if ($f1 < $today) { $bySrc[$src]['d1n']++; if (isset($p['days'][$f1])) $bySrc[$src]['d1r']++; }
+  }
+  $srows = [];
+  foreach ($bySrc as $src => $r) {
+    $srows[] = ['source' => $src, 'players' => $r['players'], 'engaged' => $r['engaged'],
+      'installs' => $r['installs'], 'd1' => $r['d1n'] ? round($r['d1r'] / $r['d1n'] * 100) : null, 'd1_n' => $r['d1n']];
+  }
+  usort($srows, fn($a, $b) => $b['players'] - $a['players']);
+  echo json_encode(['funnel' => $frows, 'daily' => $drows, 'kpis' => $kpis, 'sources' => $srows]); exit;
 }
 
 fail(404, 'not found');
