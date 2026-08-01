@@ -99,7 +99,7 @@ ${JSON.stringify(Ke(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
            MOVES. Everything else is a whisper (scoremini) */
         /* Brawl Stars-school HUD: rich navy glass panels, ONE label token,
            white chunky numbers with smooth dark outlines */
-        .hudcard { position:absolute; top:8px; z-index:4; text-align:center; padding:7px 8px 8px;
+        .hudcard { position:absolute; top:calc(8px + env(safe-area-inset-top, 0px)); z-index:4; text-align:center; padding:7px 8px 8px;
           width:calc(50% - 15px); height:86px; box-sizing:border-box; overflow:visible;
           display:flex; flex-direction:column; align-items:center;
           background:linear-gradient(#41537f, #2c3a61 55%, #253251); border:3px solid #17203a; border-radius:18px;
@@ -362,7 +362,8 @@ ${JSON.stringify(Ke(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
         /* ==================== HOME: the map IS the game's address ========== */
         .screen.home { background:linear-gradient(180deg, #2b2545, #241f36 55%, #1c1830);
           justify-content:flex-start; }
-        .wallet { display:flex; gap:8px; justify-content:center; padding:10px 10px 8px; width:100%;
+        .wallet { display:flex; gap:8px; justify-content:center; width:100%;
+          padding:calc(10px + env(safe-area-inset-top, 0px)) 10px 8px;
           box-sizing:border-box; z-index:2; }
         .wpill { display:flex; align-items:center; gap:5px; padding:5px 12px; border-radius:15px; font-size:19.5px;
           background:linear-gradient(#41537f, #2c3a61 55%, #253251); border:2px solid #17203a; color:#fff;
@@ -518,7 +519,7 @@ ${JSON.stringify(Ke(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
         .sday.done { background:rgba(47,163,72,.35); color:#9fe8af; }
         .sday.today { border-color:#ffd21c; color:#ffd21c; animation:pulse2 .8s infinite alternate; }
         /* pause */
-        .pausebtn { position:absolute; top:102px; right:10px; width:40px; height:40px; border-radius:50%;
+        .pausebtn { position:absolute; top:calc(102px + env(safe-area-inset-top, 0px)); right:10px; width:40px; height:40px; border-radius:50%;
           cursor:pointer; z-index:5; display:flex; align-items:center; justify-content:center; gap:4px;
           background:linear-gradient(#41537f, #2c3a61 55%, #253251); border:2px solid #17203a;
           box-shadow:0 3px 0 #10182c, inset 0 2px 0 rgba(255,255,255,.22); }
