@@ -1,4 +1,9 @@
 {
+  "money": {
+    "pixels": {
+      "meta": "1172684780051090"
+    }
+  },
   "global": {
     "restitution": 0.48,
     "gravity": 1.25,
