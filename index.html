@@ -480,6 +480,9 @@ ${JSON.stringify(Ke(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
         .im-claim { width:auto; padding:5px 14px; margin-top:7px; font-size:18px; }
         /* under the Nest Egg chip (top-right), never overlapping it */
         .digfab { position:absolute; top:96px; right:22px; bottom:auto; left:auto; }
+        /* the endless mode's own symbol — same ∞ the MOVES card shows in-game */
+        .digfab .infin { font-size:27px; color:#fff; line-height:1; font-weight:bold;
+          text-shadow:0 2px 0 rgba(10,25,60,.55); }
         /* left/right rail chips ride below the NEXT UNLOCK banner when it's
            up — --rail-top is measured from the banner's real height */
         .goldiechip { position:absolute; top:calc(10px + var(--rail-top, 0px)); left:14px; display:flex; align-items:center; gap:5px;
@@ -966,7 +969,7 @@ ${JSON.stringify(Ke(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
               <div class="junlock" id="junlock" style="display:none"></div>
               <div class="jmap" id="jmap"></div>
             </div>
-            <button class="fab clickable digfab" id="digbtn" title="Daily Dig"><img src="${ie("pickaxe")}" alt=""><span class="dot" id="digdot"></span></button>
+            <button class="fab clickable digfab" id="digbtn" title="Daily Dig"><span class="infin">∞</span><span class="dot" id="digdot"></span></button>
             <div class="goldiechip" id="goldiechip"></div>
             <div class="eventchip" id="eventchip" style="display:none"></div>
             <button class="piggychip clickable" id="piggy" title="Nest Egg"></button>
