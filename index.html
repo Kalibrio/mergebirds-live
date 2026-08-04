@@ -774,15 +774,22 @@ ${JSON.stringify(Ve(),null,2)}`;navigator.share?navigator.share({text:r}).catch(
            Rules: skewed parallelograms, hard #0d101f outlines + flat ledges,
            flat saturated fills, yellow CTAs w/ dark text, orange = you/active */
         .wallet { justify-content:flex-end; gap:7px; padding:calc(10px + var(--safe-top, 0px)) 14px 8px; }
-        .wpill { background:#171b2e; border:2px solid #05070f; border-radius:9px; transform:skewX(-6deg);
-          box-shadow:0 3px 0 #05070f; padding:4px 13px; font-size:19.5px; text-shadow:0 1.5px 0 #000; }
+        .wpill { background:linear-gradient(#222840,#12162a); border:2px solid #05070f; border-radius:10px; transform:skewX(-6deg);
+          box-shadow:0 3px 0 #05070f, inset 0 2px 0 rgba(255,255,255,.13); padding:4px 13px; font-size:19.5px; text-shadow:0 1.5px 0 #000; }
         .wpill img { transform:skewX(6deg); }
         .tabbar { background:#171b2e; border-top:3px solid #05070f; gap:8px; padding:9px 12px 10px; }
-        .tab { border-radius:9px; transform:skewX(-6deg); background:#262b47; border:2.5px solid #0d101f;
-          color:#fff; box-shadow:0 3.5px 0 #0d101f; padding:6px 0 5px; }
+        .tab { border-radius:11px; transform:skewX(-6deg); background:linear-gradient(#2f3552,#232941);
+          border:2.5px solid #0d101f; color:#fff;
+          box-shadow:0 3.5px 0 #0d101f, inset 0 2px 0 rgba(255,255,255,.16), inset 0 -3px 7px rgba(0,0,0,.28);
+          padding:6px 0 5px; }
         .tab > * { transform:skewX(6deg); }
-        .tab img { opacity:.85; }
-        .tab span { font-size:16.5px; letter-spacing:1px; }
+        /* icon crests OUT over the plate's top edge (Brawl "pop-out"), label stays low */
+        .tab img { opacity:1; transform:skewX(6deg) translateY(-9px) scale(1.16); margin-bottom:-5px;
+          filter:drop-shadow(0 2px 1px rgba(0,0,0,.42)); }
+        .tab span { font-size:16.5px; letter-spacing:1px; color:#fff; text-shadow:
+          1.6px 0 0 #0d101f,-1.6px 0 0 #0d101f,0 1.6px 0 #0d101f,0 -1.6px 0 #0d101f,
+          1.1px 1.1px 0 #0d101f,-1.1px 1.1px 0 #0d101f,1.1px -1.1px 0 #0d101f,-1.1px -1.1px 0 #0d101f,
+          0 3px 2px rgba(0,0,0,.45); }
         .tab.active { background:linear-gradient(#ffd94d, #ffce00); border-color:#0d101f; color:#4a2f00;
           box-shadow:0 3.5px 0 #7a5a00; }
         .tab.active span { color:#4a2f00; text-shadow:none; }
